@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DayLog</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  </head>
+  <body>
+    <!-- Background Elements -->
+    <div class="bg-elements">
+      <div class="glow-orb orb-1"></div>
+      <div class="glow-orb orb-2"></div>
+      <div class="glow-orb orb-3"></div>
+      <div class="noise-overlay"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <span class="brand-icon"><i class="ph-fill ph-clipboard-text"></i></span>
+          <h1 class="brand-name">DayLog</h1>
+        </div>
+        <!-- Top-level tabs -->
+        <nav class="top-tabs">
+          <button class="top-tab active" data-section="daily">
+            <i class="ph-fill ph-calendar-blank"></i> Daily Log
+          </button>
+          <button class="top-tab" data-section="work">
+            <i class="ph-fill ph-briefcase"></i> Work Tasks
+          </button>
+          <button class="top-tab" data-section="learnings">
+            <i class="ph-fill ph-books"></i> Learnings
+          </button>
+        </nav>
+        <!-- Date nav (only visible in Daily Log) -->
+        <div class="date-nav" id="dateNavWrapper">
+          <button class="nav-btn" id="prevDay" title="Previous day">
+            &#8592;
+          </button>
+          <div class="date-display">
+            <span class="date-label" id="dateLabel"></span>
+            <span class="date-sub" id="dateSub"></span>
+          </div>
+          <button class="nav-btn" id="nextDay" title="Next day">&#8594;</button>
+          <button class="today-btn" id="todayBtn">Today</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <!-- ═══════════════════════════════════════
+           SECTION 1 — DAILY LOG
+      ═══════════════════════════════════════ -->
+      <div id="section-daily" class="section-page">
+        <!-- Summary Cards -->
+        <section class="summary-grid">
+          <div class="summary-card accent-blue">
+            <div class="summary-icon"><i class="ph-fill ph-clock"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="totalHours">0h 0m</span>
+              <span class="summary-label">Total Hours</span>
+            </div>
+          </div>
+          <div class="summary-card accent-green">
+            <div class="summary-icon"><i class="ph-fill ph-check-circle"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="completedCount">0</span>
+              <span class="summary-label">Completed</span>
+            </div>
+          </div>
+          <div class="summary-card accent-orange">
+            <div class="summary-icon"><i class="ph-fill ph-arrows-clockwise"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="pendingCount">0</span>
+              <span class="summary-label">Pending</span>
+            </div>
+          </div>
+          <div class="summary-card accent-purple">
+            <div class="summary-icon"><i class="ph-fill ph-chart-bar"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="totalTasks">0</span>
+              <span class="summary-label">Total Tasks</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="content-grid">
+          <!-- Add Task Panel -->
+          <section class="panel add-panel collapsed" id="dailyAddPanel">
+            <div class="panel-title">
+              <span><i class="ph ph-plus-circle"></i> Add Task</span>
+              <button class="panel-header-action" onclick="togglePanel('dailyAddPanel', this)">
+                <i class="ph ph-plus"></i> Add Task
+              </button>
+            </div>
+            <form id="taskForm" class="task-form">
+              <div class="form-group">
+                <label for="taskName">Task Name *</label>
+                <input
+                  type="text"
+                  id="taskName"
+                  placeholder="What did you work on?"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="taskHours">Hours</label>
+                  <input
+                    type="number"
+                    id="taskHours"
+                    placeholder="0"
+                    min="0"
+                    max="24"
+                    value="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="taskMinutes">Minutes</label>
+                  <input
+                    type="number"
+                    id="taskMinutes"
+                    placeholder="0"
+                    min="0"
+                    max="59"
+                    value="0"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="taskNotes">Notes</label>
+                <textarea
+                  id="taskNotes"
+                  placeholder="Add any notes, thoughts, or details..."
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="taskStatus"
+                      value="completed"
+                      checked
+                    />
+                    <span class="radio-custom completed-radio"></span>Completed
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="taskStatus" value="pending" />
+                    <span class="radio-custom pending-radio"></span>Pending
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="taskStatus" value="in-progress" />
+                    <span class="radio-custom progress-radio"></span>In Progress
+                  </label>
+                </div>
+              </div>
+              <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+          </section>
+
+          <!-- Task List Panel -->
+          <section class="panel list-panel">
+            <div class="list-header">
+              <h2 class="panel-title"><i class="ph-fill ph-note-pencil"></i> Tasks</h2>
+              <div class="list-controls">
+                <input
+                  type="text"
+                  id="searchInput"
+                  placeholder="Search tasks..."
+                  class="search-input"
+                />
+                <select id="filterStatus" class="filter-select">
+                  <option value="all">All</option>
+                  <option value="completed">Completed</option>
+                  <option value="pending">Pending</option>
+                  <option value="in-progress">In Progress</option>
+                </select>
+              </div>
+            </div>
+            <div id="taskList" class="task-list"></div>
+            <div id="emptyState" class="empty-state hidden">
+              <div class="empty-icon"><i class="ph-fill ph-notepad"></i></div>
+              <p class="empty-title">No tasks yet</p>
+              <p class="empty-sub">
+                Add your first task for this day using the form on the left.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SECTION 2 — WORK TASKS (persistent)
+      ═══════════════════════════════════════ -->
+      <div id="section-work" class="section-page hidden">
+        <div class="content-grid">
+          <!-- Add Work Task -->
+          <section class="panel add-panel collapsed" id="workAddPanel">
+            <div class="panel-title">
+              <span><i class="ph ph-plus-circle"></i> Add Work Task</span>
+              <button class="panel-header-action" onclick="togglePanel('workAddPanel', this)">
+                <i class="ph ph-plus"></i> Add Task
+              </button>
+            </div>
+            <form id="workTaskForm" class="task-form">
+              <div class="form-group">
+                <label for="workTaskName">Task Name *</label>
+                <input
+                  type="text"
+                  id="workTaskName"
+                  placeholder="e.g. Refactor auth module"
+                  autocomplete="off"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="workTaskPriority">Priority</label>
+                <select id="workTaskPriority">
+                  <option value="high">High</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="workTaskEndDate">End Date</label>
+                <input type="date" id="workTaskEndDate" />
+              </div>
+              <div class="form-group">
+                <label for="workTaskNotes">Notes</label>
+                <textarea
+                  id="workTaskNotes"
+                  placeholder="Details, links, context..."
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="workTaskStatus"
+                      value="pending"
+                      checked
+                    />
+                    <span class="radio-custom pending-radio"></span>Pending
+                  </label>
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="workTaskStatus"
+                      value="in-progress"
+                    />
+                    <span class="radio-custom progress-radio"></span>In Progress
+                  </label>
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="workTaskStatus"
+                      value="completed"
+                    />
+                    <span class="radio-custom completed-radio"></span>Completed
+                  </label>
+                </div>
+              </div>
+              <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+          </section>
+
+          <!-- Work Task List -->
+          <section class="panel list-panel">
+            <div class="list-header">
+              <h2 class="panel-title">💼 Work Tasks</h2>
+              <div class="list-controls">
+                <input
+                  type="text"
+                  id="workSearchInput"
+                  placeholder="🔍 Search..."
+                  class="search-input"
+                />
+                <select id="workFilterStatus" class="filter-select">
+                  <option value="all">All</option>
+                  <option value="pending">🔄 Pending</option>
+                  <option value="in-progress">⚡ In Progress</option>
+                  <option value="completed">✅ Completed</option>
+                </select>
+                <select id="workFilterPriority" class="filter-select">
+                  <option value="all">All Priority</option>
+                  <option value="high">🔴 High</option>
+                  <option value="medium">🟡 Medium</option>
+                  <option value="low">🟢 Low</option>
+                </select>
+              </div>
+            </div>
+            <div id="workTaskList" class="task-list"></div>
+            <div id="workEmptyState" class="empty-state hidden">
+              <div class="empty-icon">💼</div>
+              <p class="empty-title">No work tasks yet</p>
+              <p class="empty-sub">
+                Add persistent tasks that are not tied to a specific day.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════
+           SECTION 3 — LEARNINGS
+      ═══════════════════════════════════════ -->
+      <div id="section-learnings" class="section-page hidden">
+        <div class="learn-topics-toolbar">
+          <div id="learnTopicTabs" class="sub-tabs-bar"></div>
+          <form id="learnTopicForm" class="learn-topic-form">
+            <input
+              type="text"
+              id="newLearnTopic"
+              class="search-input"
+              placeholder="Create topic (e.g. HLD, LLD, React)"
+              autocomplete="off"
+              required
+            />
+            <button type="submit" class="submit-btn small">Add Topic</button>
+          </form>
+        </div>
+        
+        <!-- Add Task Toggle explicitly shifted right -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 24px;">
+          <button class="panel-header-action" onclick="togglePanel('learnAddPanel', this)">
+            <i class="ph ph-plus"></i> Add Task
+          </button>
+        </div>
+
+        <div class="learn-page-layout">
+          <section class="panel add-panel collapsed" id="learnAddPanel" style="margin-bottom: 24px;">
+            <div class="panel-title hidden">
+              <span id="learnAddTitle"><i class="ph ph-plus-circle"></i> Add Task</span>
+            </div>
+            <form class="task-form" id="learnTaskForm">
+              <div class="form-group">
+                <label for="learnTaskTitle">Task *</label>
+                <input
+                  type="text"
+                  id="learnTaskTitle"
+                  placeholder="e.g. Read chapter on load balancing"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="learnTaskContent">Notes</label>
+                <textarea
+                  id="learnTaskContent"
+                  placeholder="Anything you learned, key points, resources..."
+                  rows="6"
+                ></textarea>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="learnTaskStartDate">Start Date</label>
+                  <input type="date" id="learnTaskStartDate" />
+                </div>
+                <div class="form-group">
+                  <label for="learnTaskEndDate">End Date</label>
+                  <input type="date" id="learnTaskEndDate" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="radio-group">
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="learnTaskStatus"
+                      value="pending"
+                      checked
+                    />
+                    <span class="radio-custom pending-radio"></span>Pending
+                  </label>
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="learnTaskStatus"
+                      value="in-progress"
+                    />
+                    <span class="radio-custom progress-radio"></span>In Progress
+                  </label>
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="learnTaskStatus"
+                      value="completed"
+                    />
+                    <span class="radio-custom completed-radio"></span>Completed
+                  </label>
+                </div>
+              </div>
+              <button type="submit" class="submit-btn">Add Task</button>
+            </form>
+          </section>
+
+          <section class="panel list-panel">
+            <div class="list-header">
+              <h2 class="panel-title" id="learnListTitle"><i class="ph-fill ph-books"></i> Topic Tasks</h2>
+              <div class="list-controls">
+                <input
+                  type="text"
+                  id="learnSearchInput"
+                  class="search-input"
+                  placeholder="Search tasks..."
+                />
+              </div>
+            </div>
+            <div id="learnTaskList" class="task-list"></div>
+            <div id="learnEmptyState" class="empty-state hidden">
+              <div class="empty-icon"><i class="ph-fill ph-books"></i></div>
+              <p class="empty-title">No tasks in this topic yet</p>
+              <p class="empty-sub">
+                Add your first learning task from the left panel.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- ── Daily Log Edit Modal ── -->
+    <div id="editModal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3><i class="ph-fill ph-pencil-simple"></i> Edit Task</h3>
+          <button class="modal-close" id="closeModal"><i class="ph ph-x"></i></button>
+        </div>
+        <form id="editForm" class="task-form">
+          <input type="hidden" id="editTaskId" />
+          <div class="form-group">
+            <label for="editTaskName">Task Name *</label>
+            <input type="text" id="editTaskName" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editTaskHours">Hours</label>
+              <input type="number" id="editTaskHours" min="0" max="24" />
+            </div>
+            <div class="form-group">
+              <label for="editTaskMinutes">Minutes</label>
+              <input type="number" id="editTaskMinutes" min="0" max="59" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="editTaskNotes">Notes</label>
+            <textarea id="editTaskNotes" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="editTaskStatus" value="completed" />
+                <span class="radio-custom completed-radio"></span>Completed
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="editTaskStatus" value="pending" />
+                <span class="radio-custom pending-radio"></span>Pending
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="editTaskStatus" value="in-progress" />
+                <span class="radio-custom progress-radio"></span>In Progress
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancelEdit">
+              Cancel
+            </button>
+            <button type="submit" class="submit-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Work Task Edit Modal ── -->
+    <div id="workEditModal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>✏️ Edit Work Task</h3>
+          <button class="modal-close" id="closeWorkModal">&times;</button>
+        </div>
+        <form id="workEditForm" class="task-form">
+          <input type="hidden" id="editWorkTaskId" />
+          <div class="form-group">
+            <label for="editWorkTaskName">Task Name *</label>
+            <input type="text" id="editWorkTaskName" required />
+          </div>
+          <div class="form-group">
+            <label for="editWorkTaskPriority">Priority</label>
+            <select id="editWorkTaskPriority">
+              <option value="high">🔴 High</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="editWorkTaskEndDate">End Date</label>
+            <input type="date" id="editWorkTaskEndDate" />
+          </div>
+          <div class="form-group">
+            <label for="editWorkTaskNotes">Notes</label>
+            <textarea id="editWorkTaskNotes" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="editWorkTaskStatus" value="pending" />
+                <span class="radio-custom pending-radio"></span>Pending
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  name="editWorkTaskStatus"
+                  value="in-progress"
+                />
+                <span class="radio-custom progress-radio"></span>In Progress
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  name="editWorkTaskStatus"
+                  value="completed"
+                />
+                <span class="radio-custom completed-radio"></span>Completed
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancelWorkEdit">
+              Cancel
+            </button>
+            <button type="submit" class="submit-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── Learning Note Edit Modal ── -->
+    <div id="learnEditModal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>✏️ Edit Learning Task</h3>
+          <button class="modal-close" id="closeLearnModal">&times;</button>
+        </div>
+        <form id="learnEditForm" class="task-form">
+          <input type="hidden" id="editLearnId" />
+          <input type="hidden" id="editLearnTopic" />
+          <div class="form-group">
+            <label for="editLearnTitle">Task *</label>
+            <input type="text" id="editLearnTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="editLearnContent">Notes</label>
+            <textarea id="editLearnContent" rows="6"></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="editLearnStartDate">Start Date</label>
+              <input type="date" id="editLearnStartDate" />
+            </div>
+            <div class="form-group">
+              <label for="editLearnEndDate">End Date</label>
+              <input type="date" id="editLearnEndDate" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="editLearnStatus" value="pending" />
+                <span class="radio-custom pending-radio"></span>Pending
+              </label>
+              <label class="radio-label">
+                <input
+                  type="radio"
+                  name="editLearnStatus"
+                  value="in-progress"
+                />
+                <span class="radio-custom progress-radio"></span>In Progress
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="editLearnStatus" value="completed" />
+                <span class="radio-custom completed-radio"></span>Completed
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn" id="cancelLearnEdit">
+              Cancel
+            </button>
+            <button type="submit" class="submit-btn">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

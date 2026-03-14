@@ -1,0 +1,15 @@
+{
+  "name": "daylog",
+  "version": "1.0.0",
+  "description": "Daily task tracker — monolithic Express + Supabase",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
