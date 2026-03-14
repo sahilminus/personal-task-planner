@@ -31,8 +31,12 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });
 
-// ── Start ─────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`\n🚀  DayLog running → http://localhost:${PORT}\n`);
-});
+// ── Start (Only if run directly) ──────────────────────────────
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`\n🚀  DayLog running → http://localhost:${PORT}\n`);
+  });
+}
+
+module.exports = app;

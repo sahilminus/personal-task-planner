@@ -1,0 +1,16 @@
+[build]
+  # We don't really need a build command for a vanilla app,
+  # but this ensures dependencies are installed.
+  command = "npm install"
+  publish = "public"
+  functions = "functions"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
