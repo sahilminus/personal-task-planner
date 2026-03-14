@@ -149,6 +149,12 @@ async function updateUIForAuth() {
   if (session) {
     overlay.classList.add("hidden");
     container.classList.remove("hidden");
+    
+    // Display User Name
+    const userName = session.user.user_metadata?.full_name || session.user.email.split('@')[0];
+    const nameEl = document.getElementById("displayUserName");
+    if (nameEl) nameEl.textContent = userName;
+
     if (typeof switchSection === 'function') switchSection("daily");
   } else {
     overlay.classList.remove("hidden");

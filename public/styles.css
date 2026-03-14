@@ -1523,3 +1523,62 @@ textarea {
   border-color: rgba(239, 68, 68, 0.3);
   transform: translateY(-2px);
 }
+
+/* User Profile & Header Right */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 6px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: var(--transition);
+}
+
+.user-profile:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.user-avatar {
+  font-size: 1.4rem;
+  color: var(--accent-base);
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  color: #ff5f56;
+  background: rgba(255, 95, 86, 0.1);
+}
+
+/* Toast Z-index Fix */
+.toast-container {
+  z-index: 9999 !important;
+}
