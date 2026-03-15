@@ -5,6 +5,7 @@ const db = require("../lib/supabase");
 
 // ── GET /api/daily?date=YYYY-MM-DD  (list for a day) ─────────
 router.get("/", async (req, res) => {
+  const db = req.db;
   const { date } = req.query;
   if (!date)
     return res.status(400).json({ error: "date query param is required" });
@@ -22,6 +23,7 @@ router.get("/", async (req, res) => {
 
 // ── GET /api/daily/:id  (single task — used by edit modal) ────
 router.get("/:id", async (req, res) => {
+  const db = req.db;
   const { data, error } = await db
     .from("daily_tasks")
     .select("*")
@@ -35,6 +37,7 @@ router.get("/:id", async (req, res) => {
 
 // ── POST /api/daily ───────────────────────────────────────────
 router.post("/", async (req, res) => {
+  const db = req.db;
   const { id, name, hours, minutes, notes, status, date_key } = req.body;
 
   const { data, error } = await db
@@ -59,6 +62,7 @@ router.post("/", async (req, res) => {
 
 // ── PATCH /api/daily/:id ──────────────────────────────────────
 router.patch("/:id", async (req, res) => {
+  const db = req.db;
   const { data, error } = await db
     .from("daily_tasks")
     .update({ ...req.body, updated_at: new Date().toISOString() })
@@ -73,6 +77,7 @@ router.patch("/:id", async (req, res) => {
 
 // ── DELETE /api/daily/:id ─────────────────────────────────────
 router.delete("/:id", async (req, res) => {
+  const db = req.db;
   const { error } = await db
     .from("daily_tasks")
     .delete()

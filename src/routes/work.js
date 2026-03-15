@@ -3,13 +3,14 @@
 const router = require("express").Router();
 const db = require("../lib/supabase");
 
-async function tableExists(tableName) {
+async function tableExists(db, tableName) {
   const { error } = await db.from(tableName).select("id").limit(1);
   return !error;
 }
 
 // ── GET /api/work/topics ───────────────────────────────────
 router.get("/topics", async (req, res) => {
+  const db = req.db;
   const topics = new Set();
 
   const { data: workTasks, error: tasksError } = await db
@@ -23,7 +24,7 @@ router.get("/topics", async (req, res) => {
     if (row.topic) topics.add(row.topic);
   });
 
-  if (await tableExists("work_topics")) {
+  if (await tableExists(db, "work_topics")) {
     const { data: topicRows, error: topicError } = await db
       .from("work_topics")
       .select("name")
@@ -41,6 +42,7 @@ router.get("/topics", async (req, res) => {
 
 // ── POST /api/work/topics ──────────────────────────────────
 router.post("/topics", async (req, res) => {
+  const db = req.db;
   const name = (req.body?.name || "").trim();
   const id = req.body?.id;
 
@@ -71,6 +73,7 @@ router.post("/topics", async (req, res) => {
 
 // ── DELETE /api/work/topics/:name ──────────────────────────
 router.delete("/topics/:name", async (req, res) => {
+  const db = req.db;
   const { name } = req.params;
 
   const { error: tasksError } = await db
@@ -81,7 +84,7 @@ router.delete("/topics/:name", async (req, res) => {
 
   if (tasksError) return res.status(500).json({ error: tasksError.message });
 
-  if (await tableExists("work_topics")) {
+  if (await tableExists(db, "work_topics")) {
     const { error: topicError } = await db
       .from("work_topics")
       .delete()
@@ -96,6 +99,7 @@ router.delete("/topics/:name", async (req, res) => {
 
 // ── GET /api/work  (all work tasks filtered by optional topic) ─────────
 router.get("/", async (req, res) => {
+  const db = req.db;
   const { topic } = req.query;
 
   let query = db
@@ -116,6 +120,7 @@ router.get("/", async (req, res) => {
 
 // ── GET /api/work/:id  (single — used by edit modal) ─────────
 router.get("/:id", async (req, res) => {
+  const db = req.db;
   const { data, error } = await db
     .from("work_tasks")
     .select("*")
@@ -129,6 +134,7 @@ router.get("/:id", async (req, res) => {
 
 // ── POST /api/work ────────────────────────────────────────────
 router.post("/", async (req, res) => {
+  const db = req.db;
   const { id, topic, name, priority, notes, status, end_date } = req.body;
 
   const payload = {
@@ -154,6 +160,7 @@ router.post("/", async (req, res) => {
 
 // ── PATCH /api/work/:id ───────────────────────────────────────
 router.patch("/:id", async (req, res) => {
+  const db = req.db;
   const payload = { ...req.body, updated_at: new Date().toISOString() };
   if (!Object.prototype.hasOwnProperty.call(req.body, "end_date")) {
     delete payload.end_date;
@@ -173,6 +180,7 @@ router.patch("/:id", async (req, res) => {
 
 // ── DELETE /api/work/:id ──────────────────────────────────────
 router.delete("/:id", async (req, res) => {
+  const db = req.db;
   const { error } = await db
     .from("work_tasks")
     .delete()

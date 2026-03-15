@@ -18,6 +18,7 @@ async function authMiddleware(req, res, next) {
     }
 
     req.user = user;
+    req.db = db.getClient(token);
     next();
   } catch (err) {
     return res.status(500).json({ error: "Internal Server Error" });

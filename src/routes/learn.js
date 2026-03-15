@@ -3,13 +3,14 @@
 const router = require("express").Router();
 const db = require("../lib/supabase");
 
-async function tableExists(tableName) {
+async function tableExists(db, tableName) {
   const { error } = await db.from(tableName).select("id").limit(1);
   return !error;
 }
 
 // ── GET /api/learn/topics ───────────────────────────────────
 router.get("/topics", async (req, res) => {
+  const db = req.db;
   const topics = new Set();
 
   const { data: noteTopics, error: notesError } = await db
@@ -23,7 +24,7 @@ router.get("/topics", async (req, res) => {
     if (row.topic) topics.add(row.topic);
   });
 
-  if (await tableExists("learn_topics")) {
+  if (await tableExists(db, "learn_topics")) {
     const { data: topicRows, error: topicError } = await db
       .from("learn_topics")
       .select("name")
@@ -41,6 +42,7 @@ router.get("/topics", async (req, res) => {
 
 // ── POST /api/learn/topics ──────────────────────────────────
 router.post("/topics", async (req, res) => {
+  const db = req.db;
   const name = (req.body?.name || "").trim();
   const id = req.body?.id;
 
@@ -71,6 +73,7 @@ router.post("/topics", async (req, res) => {
 
 // ── DELETE /api/learn/topics/:name ─────────────────────────
 router.delete("/topics/:name", async (req, res) => {
+  const db = req.db;
   const { name } = req.params;
 
   const { error: tasksError } = await db
@@ -81,7 +84,7 @@ router.delete("/topics/:name", async (req, res) => {
 
   if (tasksError) return res.status(500).json({ error: tasksError.message });
 
-  if (await tableExists("learn_topics")) {
+  if (await tableExists(db, "learn_topics")) {
     const { error: topicError } = await db
       .from("learn_topics")
       .delete()
@@ -96,6 +99,7 @@ router.delete("/topics/:name", async (req, res) => {
 
 // ── GET /api/learn?topic=hld ──────────────────────────────────
 router.get("/", async (req, res) => {
+  const db = req.db;
   const { topic } = req.query;
   
   let query = db
@@ -116,6 +120,7 @@ router.get("/", async (req, res) => {
 
 // ── GET /api/learn/:id  (single — used by edit modal) ────────
 router.get("/:id", async (req, res) => {
+  const db = req.db;
   const { data, error } = await db
     .from("learn_notes")
     .select("*")
@@ -129,6 +134,7 @@ router.get("/:id", async (req, res) => {
 
 // ── POST /api/learn ───────────────────────────────────────────
 router.post("/", async (req, res) => {
+  const db = req.db;
   const { id, topic, title, content, tags, status, start_date, end_date } =
     req.body;
 
@@ -166,6 +172,7 @@ router.post("/", async (req, res) => {
 
 // ── PATCH /api/learn/:id ──────────────────────────────────────
 router.patch("/:id", async (req, res) => {
+  const db = req.db;
   const { data, error } = await db
     .from("learn_notes")
     .update({ ...req.body, user_id: req.user.id, updated_at: new Date().toISOString() })
@@ -191,6 +198,7 @@ router.patch("/:id", async (req, res) => {
 
 // ── DELETE /api/learn/:id ─────────────────────────────────────
 router.delete("/:id", async (req, res) => {
+  const db = req.db;
   const { error } = await db
     .from("learn_notes")
     .delete()
