@@ -48,7 +48,7 @@ router.post("/topics", async (req, res) => {
 
   if (!name) return res.status(400).json({ error: "name is required" });
 
-  if (!(await tableExists("work_topics"))) {
+  if (!(await tableExists(db, "work_topics"))) {
     return res.status(400).json({
       error:
         "work_topics table not found. Run latest schema.sql to enable custom topic creation.",
